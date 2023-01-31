@@ -1,0 +1,56 @@
+pipeline:
+  name: fastapi-harness-sample
+  identifier: fastapiharnesssample
+  projectIdentifier: default
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: git-connector
+        repoName: fastapi-harness-sample
+        build: <+input>
+  stages:
+    - stage:
+        name: FastAPI CI
+        identifier: FastAPI_CI
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Install Dependencies
+                  identifier: Install_Dependencies
+                  spec:
+                    shell: Sh
+                    command: sudo apt-get update && sudo apt-get install -y python3-dev && sudo apt-get install default-libmysqlclient-dev
+              - step:
+                  type: Run
+                  name: pip
+                  identifier: pip
+                  spec:
+                    shell: Sh
+                    command: |
+                      pip download --cache-dir .pip_cache -r requirements.txt
+              - step:
+                  type: Run
+                  name: Run Unit Tests
+                  identifier: Run_Unit_Tests
+                  spec:
+                    shell: Sh
+                    command: pip install -r requirements.txt --cache-dir .pip_cache
+              - step:
+                  type: Run
+                  name: Pytest
+                  identifier: Pytest
+                  spec:
+                    shell: Sh
+                    command: "pytest "
